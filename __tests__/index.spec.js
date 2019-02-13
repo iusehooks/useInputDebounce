@@ -1,7 +1,6 @@
 import React from "react";
 import { render, fireEvent, cleanup } from "react-testing-library";
 import useInputDebounce from "./../src";
-import { debug } from "util";
 
 const effect = jest.fn();
 
