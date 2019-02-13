@@ -5,8 +5,8 @@ import { debug } from "util";
 
 const effect = jest.fn();
 
-const DebouncedComponent = ({ delay, minLength }) => {
-  const attributes = useInputDebounce(effect, { delay, minLength });
+const DebouncedComponent = ({ delay, minLength, initial }) => {
+  const attributes = useInputDebounce(effect, { initial, delay, minLength });
   return <input data-testid="my-test-input" {...attributes} />;
 };
 
@@ -44,6 +44,14 @@ describe("useInputDebounce", () => {
     const { getByTestId } = render(<DebouncedComponent />);
     const dInput = getByTestId("my-test-input");
     fireEvent.change(dInput, { target: { value: "ab" } });
+    jest.runAllTimers();
+    expect(effect).toBeCalledTimes(1);
+  });
+  it("called with inital value of 'a'", () => {
+    const { getByTestId } = render(
+      <DebouncedComponent delay={1000} minLength={1} initial="a" />
+    );
+    const dInput = getByTestId("my-test-input");
     jest.runAllTimers();
     expect(effect).toBeCalledTimes(1);
   });
