@@ -55,7 +55,7 @@ describe("useInputDebounce", () => {
     expect(effect).toBeCalledTimes(1);
   });
   it("setTimeout", () => {
-    const { getByTestId, debug } = render(
+    const { getByTestId } = render(
       <DebouncedComponent delay={1000} minLength={1} />
     );
     const dInput = getByTestId("my-test-input");
