@@ -7,8 +7,8 @@ export default function useInputDebounce(
 ) {
   const [value, setValue] = useState(initial);
   const [onChange] = useState(() => e => {
-    const value = e && e.target ? e.target.value : e;
-    setValue(value || "");
+    const value = e && e.target ? e.target.value : undefined;
+    if (typeof value === "string") setValue(value || "");
   });
 
   useEffect(() => {
