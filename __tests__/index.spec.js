@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { render, fireEvent, cleanup } from "react-testing-library";
 import useInputDebounce from "./../src";
 
@@ -7,6 +7,28 @@ const effect = jest.fn();
 const DebouncedComponent = ({ delay, minLength, initial }) => {
   const attributes = useInputDebounce(effect, { initial, delay, minLength });
   return <input data-testid="my-test-input" {...attributes} />;
+};
+
+const DebouncedComponentWithEffect = ({ delay, minLength, initial }) => {
+  const [todoList, addTodoList] = useState([]);
+  const updateValueEffect = (value, updateValue) => {
+    updateValue("Hard set value");
+    addTodoList([...todoList, value]);
+  };
+
+  const attributes = useInputDebounce(updateValueEffect, {
+    initial,
+    delay,
+    minLength
+  });
+  return (
+    <div>
+      <input data-testid="my-test-input" {...attributes} />
+      {todoList.map(item => (
+        <div key={item}>{item}</div>
+      ))}
+    </div>
+  );
 };
 
 describe("useInputDebounce", () => {
@@ -62,5 +84,17 @@ describe("useInputDebounce", () => {
     fireEvent.change(dInput, { target: { value: "a" } });
     jest.advanceTimersByTime(1500);
     expect(effect).toBeCalledTimes(1);
+  });
+  it("calling updateValue in effect", () => {
+    const { getByTestId, getByText } = render(
+      <DebouncedComponentWithEffect delay={1000} minLength={1} />
+    );
+    const dInput = getByTestId("my-test-input");
+    fireEvent.change(dInput, { target: { value: "abc" } });
+    jest.advanceTimersByTime(1500);
+    fireEvent.change(dInput, { target: { value: "xyz" } });
+    jest.advanceTimersByTime(1500);
+    expect(getByText("abc")).toBeTruthy();
+    expect(getByText("xyz")).toBeTruthy();
   });
 });
